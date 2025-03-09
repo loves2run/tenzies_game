@@ -4,7 +4,7 @@
 
 body {
     margin: 0;
-
+    font-family: Inter, sans-serif;
 }
 
 div#root {
@@ -49,3 +49,23 @@ allows me to place content inside teh square appropriately! */
     align-items: center;
 }
 
+.diceContainer {
+    display: grid;
+    grid-template: auto auto / repeat(5, 1fr);
+    gap: 20px;
+}
+
+.diceContainer button {
+    /* padding: 0;
+    aspect-ratio: 1; */
+    height: 75px;
+    width: 75px;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 1.15);
+    border-radius: 10px;
+    border: none;
+    background-color: #fff;
+    font-family: Inter, sans-serif;
+    font-size: 1.75rem;
+    font-weight: bold;
+    cursor: pointer;
+}
