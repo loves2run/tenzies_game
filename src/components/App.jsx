@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { nanoid } from 'nanoid'
 
 import Die from './Die'
 
@@ -7,15 +8,18 @@ export default function App() {
     const [diceArray, setDiceArray] = useState(generatAllNewDice())
 
     function generatAllNewDice() {
-        return new Array(10).fill(0).map(() => Math.ceil(Math.random() *6))
+        return new Array(10).fill(0).map(() => ({
+            value: Math.ceil(Math.random() *6),
+            isHeld: false,
+            id: nanoid()
+        }))
     }
 
-    const dice = diceArray.map(value => <Die value={value} />)
-/*
-* add new button per figma design
-* add event listener to button to generate new array of numbers
-* this should set diceArray state to the new array
-*/
+    const dice = diceArray.map(dieObj => <Die key={dieObj.id} value={dieObj.value} />)
+
+    function rollDice() {
+        setDiceArray(generatAllNewDice())
+    }
 
 
     return(
@@ -24,6 +28,9 @@ export default function App() {
                 <div className="diceContainer">
                     {dice}
                 </div>
+
+                <button id="rollButton" onClick={rollDice}>Roll</button>
+
             </section>
         </main>
     )
