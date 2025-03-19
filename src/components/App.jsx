@@ -1,14 +1,25 @@
 import { useState } from 'react'
+import {useRef, useEffect} from 'react'
 import { nanoid } from 'nanoid'
-
 import Die from './Die'
+import ConfettiComp from './Confetti'
 
 export default function App() {
 
-    const [dice, setDice] = useState(generatAllNewDice())
-    
+    const [dice, setDice] = useState(generateAllNewDice())
+    const newGameFocus = useRef(null)
 
-    function generatAllNewDice() {
+    const gameWon = dice.every(die => die.isHeld === true) &&
+    dice.every(die => die.value === dice[0].value)
+
+    useEffect(() => {
+        if(gameWon && newGameFocus.current !== null) {
+            newGameFocus.current.focus({ focusVisible: true })
+        }
+    }, [gameWon])
+   
+
+    function generateAllNewDice() {
         return new Array(10).fill(0).map(() => ({
             value: Math.ceil(Math.random() *6),
             isHeld: false,
@@ -26,14 +37,11 @@ export default function App() {
            />)
     )
 
-    /*
-        -call setDice to trigger re-render of our state variable
-        - map over the array of die objects
-        - if die being iterated over containes a isHeld: false then generate a new value
-    */
+    function resetGame() {
+        setDice(generateAllNewDice)
+    }
 
     function rollDice() {
-        // setDice(generatAllNewDice())
         setDice(oldDice => oldDice.map(die =>
             die.isHeld !== true ?
                 {...die, value: Math.ceil(Math.random() * 6)}:
@@ -51,6 +59,10 @@ export default function App() {
 
     return(
         <main>
+            {gameWon && <ConfettiComp />}
+            <div aria-live="polite" className="sr-only">
+                {gameWon && <p>Congratulations! You won! Press "New Game" to start again.</p>}
+            </div>
             <h1 className="title">Tenzies</h1>
             <p className="instructions">Roll until all dice are the same. Click each die to freeze 
             it at its current value between rolls.</p>
@@ -59,7 +71,9 @@ export default function App() {
                     {diceElements}
                 </div>
 
-                <button id="rollButton" onClick={rollDice}>Roll</button>
+                <button id="rollButton" onClick={gameWon ? resetGame : rollDice} ref={newGameFocus}>
+                    {gameWon ? 'New Game' : 'Roll'}
+                </button>
         </main>
     )
 }
