@@ -3,9 +3,12 @@ import {useRef, useEffect} from 'react'
 import { nanoid } from 'nanoid'
 import Die from './Die'
 import ConfettiComp from './Confetti'
+import GameTimer from './GameTimer'
+
 
 export default function App() {
 
+    // const [timerReset, setTimerReset] = useState(false)    
     const [dice, setDice] = useState(generateAllNewDice())
     const newGameFocus = useRef(null)
 
@@ -66,6 +69,8 @@ export default function App() {
             <h1 className="title">Tenzies</h1>
             <p className="instructions">Roll until all dice are the same. Click each die to freeze 
             it at its current value between rolls.</p>
+
+            <GameTimer gameWon={gameWon}/>
 
                 <div className="diceContainer">
                     {diceElements}
