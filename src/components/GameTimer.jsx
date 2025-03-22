@@ -1,82 +1,100 @@
-import { useState, useRef, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-export default function GameTimer(props) {
+export default function GameTimer({gameWon}){
+    /* 
+    WHAT SHOULD TIMER DO?
+        - start a timer when the user first clicks die to hold it
+        - stop timer when gameWon becomes true
+        - reset timer when new game button is clicked
 
-    console.log("GameWon:", props.gameWon)
+    PSEUDO CODE TO BUILD IT
+        - identify accurate method for tracking time --> Date.now()
+        - identify state variables needed
+            -tracking if timer is running or not
+            -tracking total time since timer started
+            -storing timestamp of last updated time (for timing accuracy)
+        -create timer mechanism
+        -calculate elapsed time
+        -add user controls if I want the user to be able to pause or reset time during game
+        -render Timer app in App.jsx
+        -styling for Timer
 
-    const[timer, setTimer] = useState(0)
+    */
+
     const [isRunning, setIsRunning] = useState(false)
+    const [clock, setClock] = useState(0)
+    const [lastUpdateTime, setLastUpdateTime] = useState(Date.now())
 
-    let timeInterval = useRef(null)
+    useEffect(() => {
+        const timer = () => {
+            const now = Date.now()
+            setClock(prevClock => prevClock + (now - lastUpdateTime))
+            setLastUpdateTime(now)
+        }
+
+        let intervalId
+        if (isRunning) {
+            intervalId = setInterval(timer, 100)
+        }
+
+        return () => clearInterval(intervalId)
+
+    }, [gameWon, isRunning, lastUpdateTime])
 
     const handleStart = () => {
-        if (isRunning) return  //guard clause to check if isRunning is true, if it is the function just stops running
+        if (isRunning) return
         setIsRunning(true)
-        timeInterval.current = setInterval(() => {   //setInterval is a built-in JS function
-            setTimer((prev) => prev + 1)
-        }, 10)
+        setLastUpdateTime(Date.now())
+
     }
 
     const handlePause = () => {
-        if(!isRunning) return
+        if (!isRunning) return
         setIsRunning(false)
-        clearInterval(timeInterval.current)   //clearInterval is the counterpart to setInterval
     }
 
-    const handleStop = () => {
-        if(isRunning && timer === 0) //guard clause
+    const handleReset = () => {
         setIsRunning(false)
-        clearInterval(timeInterval.current)
-        setTimer(0)
+        setClock(0)
+        setLastUpdateTime(Date.now())
     }
 
-    const formatTime = (timer) => {
-        const minutes = Math.floor(timer / 60000)
+    const formatTime = (clock) => {
+        const minutes = Math.floor(clock / 60000)
             .toString()
             .padStart(2, "0")
-        const seconds = Math.floor(timer / 1000) % 60
+        const seconds = Math.floor(clock / 1000) % 60
             .toString()
             .padStart(2, "0")
-        const milliSeconds = (timer % 1000) 
+        const milliseconds = Math.floor(clock)
             .toString()
-            .padStart(3, "0")
-        
-        return { minutes, seconds, milliSeconds}
+            .slice(-2)
+
+        return {minutes, seconds, milliseconds}
     }
 
-    useEffect(() => {
-        if(props.gameWon === true ) {
-            handlePause()
-            setTimer(0)
-        }
-    }, [props.gameWon])
-
-    const { minutes, seconds, milliSeconds } = formatTime(timer) //using destructuring assignment to extract the 
-                                                                 //3 time components returned in formatTime fx
-                                                                 //these variables can now be used in my component
-                                                                 //outside the function
+    const { minutes, seconds, milliseconds } = formatTime(clock)
 
     return (
         <div className="timerApp">
-            <div className="timerContainer">
-                <div className="timerBox">
-                    <h1>{minutes}</h1>
-                </div>
-                <span className="colon">:</span>
-                <div className="timerBox">
-                    <h1>{seconds}</h1>
-                </div>
-                <span className="colon">:</span>
-                <div className="timerBox">
-                    <h1>{milliSeconds}</h1>
-                </div>
+        <div className="timerContainer">
+            <div className="timerBox">
+                <h1>{minutes}</h1>
             </div>
-            <div className="buttonContainer">
-                <button onClick={handleStart}>Start</button>
-                <button onClick={handlePause}>Pause</button>
-                <button onClick={handleStop}>Reset</button>
+            <span className="colon">:</span>
+            <div className="timerBox">
+                <h1>{seconds}</h1>
+            </div>
+            <span className="colon">:</span>
+            <div className="timerBox">
+                <h1>{milliseconds}</h1>
             </div>
         </div>
-        
+        <div className="buttonContainer">
+            <button onClick={handleStart}>Start</button>
+            <button onClick={handlePause}>Pause</button>
+            <button onClick={handleReset}>Reset</button>
+        </div>
+    </div>
     )
 }
