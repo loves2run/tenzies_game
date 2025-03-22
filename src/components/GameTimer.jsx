@@ -47,6 +47,12 @@ export default function GameTimer({gameWon, shouldStartTimer}){
         }
     }, [shouldStartTimer])
 
+    useEffect(() => {
+        if(gameWon) {
+            handlePause()
+        }
+    }, [gameWon])
+
     const handleStart = () => {
         if (isRunning) return
         setIsRunning(true)
