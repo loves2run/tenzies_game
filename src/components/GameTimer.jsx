@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function GameTimer({gameWon}){
+export default function GameTimer({gameWon, shouldStartTimer}){
     /* 
     WHAT SHOULD TIMER DO?
         - start a timer when the user first clicks die to hold it
@@ -40,6 +40,12 @@ export default function GameTimer({gameWon}){
         return () => clearInterval(intervalId)
 
     }, [gameWon, isRunning, lastUpdateTime])
+
+    useEffect(() => {
+        if (shouldStartTimer && !isRunning) {
+            handleStart()
+        }
+    }, [shouldStartTimer])
 
     const handleStart = () => {
         if (isRunning) return
