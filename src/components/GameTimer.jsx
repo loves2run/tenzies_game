@@ -1,25 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function GameTimer({gameWon, shouldStartTimer}){
-    /* 
-    WHAT SHOULD TIMER DO?
-        - start a timer when the user first clicks die to hold it
-        - stop timer when gameWon becomes true
-        - reset timer when new game button is clicked
-
-    PSEUDO CODE TO BUILD IT
-        - identify accurate method for tracking time --> Date.now()
-        - identify state variables needed
-            -tracking if timer is running or not
-            -tracking total time since timer started
-            -storing timestamp of last updated time (for timing accuracy)
-        -create timer mechanism
-        -calculate elapsed time
-        -add user controls if I want the user to be able to pause or reset time during game
-        -render Timer app in App.jsx
-        -styling for Timer
-
-    */
+export default function GameTimer({gameWon, diceHeld, timerReset}){
 
     const [isRunning, setIsRunning] = useState(false)
     const [clock, setClock] = useState(0)
@@ -42,16 +23,22 @@ export default function GameTimer({gameWon, shouldStartTimer}){
     }, [gameWon, isRunning, lastUpdateTime])
 
     useEffect(() => {
-        if (shouldStartTimer && !isRunning) {
+        if (diceHeld && !isRunning) {
             handleStart()
         }
-    }, [shouldStartTimer])
+    }, [diceHeld])
 
     useEffect(() => {
         if(gameWon) {
             handlePause()
         }
     }, [gameWon])
+
+    useEffect(() => {
+        if(timerReset > 1) {
+            handleReset()
+        }
+    }, [timerReset])
 
     const handleStart = () => {
         if (isRunning) return
@@ -78,9 +65,10 @@ export default function GameTimer({gameWon, shouldStartTimer}){
         const seconds = Math.floor(clock / 1000) % 60
             .toString()
             .padStart(2, "0")
-        const milliseconds = Math.floor(clock)
+        const milliseconds = Math.floor(clock / 10) % 100
             .toString()
-            .slice(-2)
+            .padStart(2, "0")
+        
 
         return {minutes, seconds, milliseconds}
     }
@@ -101,11 +89,6 @@ export default function GameTimer({gameWon, shouldStartTimer}){
             <div className="timerBox">
                 <h1>{milliseconds}</h1>
             </div>
-        </div>
-        <div className="buttonContainer">
-            <button onClick={handleStart}>Start</button>
-            <button onClick={handlePause}>Pause</button>
-            <button onClick={handleReset}>Reset</button>
         </div>
     </div>
     )

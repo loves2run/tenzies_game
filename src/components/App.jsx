@@ -11,6 +11,7 @@ export default function App() {
     // const [timerReset, setTimerReset] = useState(false)    
     const [dice, setDice] = useState(generateAllNewDice())
     const [anyDiceHeld, setAnyDiceHeld] = useState(false)
+    const [timerReset, setTimerReset] = useState(1)
     const newGameFocus = useRef(null)
 
     const gameWon = dice.every(die => die.isHeld === true) &&
@@ -43,6 +44,8 @@ export default function App() {
 
     function resetGame() {
         setDice(generateAllNewDice)
+        setTimerReset(oldCount => oldCount + 1)
+        setAnyDiceHeld(false)
     }
 
     function rollDice() {
@@ -78,7 +81,11 @@ export default function App() {
             <p className="instructions">Roll until all dice are the same. Click each die to freeze 
             it at its current value between rolls.</p>
 
-            <GameTimer gameWon={gameWon} shouldStartTimer={anyDiceHeld} />
+            <GameTimer 
+                gameWon={gameWon} 
+                diceHeld={anyDiceHeld} 
+                timerReset={timerReset} 
+            />
 
                 <div className="diceContainer">
                     {diceElements}
